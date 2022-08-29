@@ -1,0 +1,179 @@
+
+
+----------------------------------------------------------------------------------------------------------------
+
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+
+namespace Solution
+{
+    public class Solution
+    {
+
+        public static Dictionary<string, int> AverageAgeForEachCompany(List<Employee> employees)
+        {
+            
+            return employees.
+            GroupBy(e => e.Company).
+            OrderBy(e => e.Key).
+            Select(grp => new 
+                        {CompanyName = grp.Key, 
+                        Average = (int)Math.Round(grp.Average(e => e.Age))
+                        }).
+            ToDictionary(item => item.CompanyName.ToString(), item=> item.Average);
+        }
+        
+        public static Dictionary<string, int> CountOfEmployeesForEachCompany(List<Employee> employees)
+        {
+            
+            return employees.
+            GroupBy(e => e.Company).
+            OrderBy(e => e.Key).
+            Select(grp => new 
+                        {CompanyName = grp.Key, 
+                        Count = (int)grp.Count()
+                        }).
+            ToDictionary(item => item.CompanyName.ToString(), item => item.Count);
+        }
+        
+        public static Dictionary<string, Employee> OldestAgeForEachCompany(List<Employee> employees)
+        {
+            return employees.
+            GroupBy(e => e.Company).
+            OrderBy(e => e.Key).
+            Select(grp => new 
+                        {CompanyName = grp.Key, 
+                         Emp = employees.Where(p => p.Company == grp.Key && p.Age == (int)grp.Max(e => e.Age)).FirstOrDefault()
+                        }).ToDictionary(item => item.CompanyName.ToString(), item => item.Emp);  
+        }
+
+        public static void Main()
+        {   
+            int countOfEmployees = int.Parse(Console.ReadLine());
+            
+            var employees = new List<Employee>();
+            
+            for (int i = 0; i < countOfEmployees; i++)
+            {
+                string str = Console.ReadLine();
+                string[] strArr = str.Split(' ');
+                employees.Add(new Employee { 
+                    FirstName = strArr[0], 
+                    LastName = strArr[1], 
+                    Company = strArr[2], 
+                    Age = int.Parse(strArr[3]) 
+                    });
+            }
+            
+            foreach (var emp in AverageAgeForEachCompany(employees))
+            {
+                Console.WriteLine($"The average age for company {emp.Key} is {emp.Value}");
+            }
+            
+            foreach (var emp in CountOfEmployeesForEachCompany(employees))
+            {
+                Console.WriteLine($"The count of employees for company {emp.Key} is {emp.Value}");
+            }
+            
+            foreach (var emp in OldestAgeForEachCompany(employees))
+            {
+                Console.WriteLine($"The oldest employee of company {emp.Key} is {emp.Value.FirstName} {emp.Value.LastName} having age {emp.Value.Age}");
+            }
+        }
+    }
+    
+    public class Employee
+    {
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
+        public int Age { get; set; }
+        public string Company { get; set; }
+    }
+}   
+
+--------------------------------------------------------------------
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+
+namespace Solution {
+    public class Team {
+        public string teamName;
+        public int noOfPlayers;
+        public Team(string teamName, int noOfPlayers)
+        {
+            this.teamName = teamName;
+            this.noOfPlayers = noOfPlayers;
+        }
+
+        public void AddPlayer(int count)
+        {
+            noOfPlayers += count;
+        }
+        public bool RemovePlayer(int count)
+        {
+            if ((noOfPlayers - count) < 0)
+            {
+                return false;
+            }
+            else
+            {
+                noOfPlayers -= count;
+                return true;
+            }
+        }
+    }
+
+    public class Subteam: Team 
+    {
+        public Subteam(string teamName, int noOfPlayers) : 
+        base(teamName, noOfPlayers)
+        {
+        }
+        public void ChangeTeamName(string name)
+        {
+            this.teamName = name;
+        }
+        
+    }
+
+    class Solution {
+         static void Main(string[] args) {
+
+            if (!typeof(Subteam).IsSubclassOf(typeof(Team))) {
+                throw new Exception("Subteam class should inherit from Team class");
+            }
+            
+            String str = Console.ReadLine();
+            String[] strArr = str.Split();
+            string initialName = strArr[0];
+            int count = Convert.ToInt32(strArr[1]);
+            Subteam teamObj = new Subteam(initialName, count);
+            Console.WriteLine("Team " + teamObj.teamName + " created");
+            
+            str = Console.ReadLine();
+            count = Convert.ToInt32(str);
+            Console.WriteLine("Current number of players in team " + teamObj.teamName + " is " + teamObj.noOfPlayers);
+            teamObj.AddPlayer(count);
+            Console.WriteLine("New number of players in team " + teamObj.teamName + " is " + teamObj.noOfPlayers);
+            
+            
+            str = Console.ReadLine();
+            count = Convert.ToInt32(str);
+            Console.WriteLine("Current number of players in team " + teamObj.teamName + " is " + teamObj.noOfPlayers);
+            var res = teamObj.RemovePlayer(count);
+            if (res) {
+                Console.WriteLine("New number of players in team " + teamObj.teamName + " is " + teamObj.noOfPlayers);
+            } else {
+                Console.WriteLine("Number of players in team " + teamObj.teamName + " remains same");
+            }
+            
+            str = Console.ReadLine();
+            teamObj.ChangeTeamName(str);
+            Console.WriteLine("Team name of team " + initialName + " changed to " + teamObj.teamName);
+        }
+    }
+}
